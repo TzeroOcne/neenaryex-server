@@ -1,9 +1,12 @@
 {{#each query_list}}
 import './{{this}}';
 {{/each}}
+import { db } from './database.ts';
 
 setTimeout(() => {
+  db.close();
   console.log('Migration successfully executed');
+  process.exit();
 });
 
 export {};

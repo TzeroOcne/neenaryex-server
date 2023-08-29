@@ -1,0 +1,2 @@
+migration/scripts/templates/**/*.ts
+migration/query/**/*.ts

@@ -1,5 +1,5 @@
 import { existsSync } from 'fs';
-import { mkdir, readFile, readdir, writeFile } from 'fs/promises';
+import { copyFile, mkdir, readFile, readdir, writeFile } from 'fs/promises';
 import Handlebars from 'handlebars';
 import minimist, { ParsedArgs } from 'minimist-lite';
 import { dirname, resolve } from 'path';
@@ -11,14 +11,21 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const templateFolder = resolve(__dirname, 'templates');
 const rootFolder = resolve(__dirname, '..');
 const queryFolder = resolve(rootFolder, 'query');
+const queryIndexScript = resolve(queryFolder, 'index.ts');
+const queryDatabaseScript = resolve(queryFolder, 'database.ts');
+
+const addTemplate = Handlebars.compile(await readFile(resolve(templateFolder, 'add.handlebars'), 'utf-8'));
+const queryIndexTemplate = Handlebars.compile(await readFile(resolve(templateFolder, 'query.index.handlebars'), 'utf-8'));
 
 if (!existsSync(queryFolder)) {
   await mkdir(queryFolder);
-  await writeFile(resolve(queryFolder, 'index.ts'), 'export {};');
 }
-
-const addTemplate = Handlebars.compile(await readFile(resolve(templateFolder, 'add.handlebars'), 'utf-8'));
-const addIndexTemplate = Handlebars.compile(await readFile(resolve(templateFolder, 'add.index.handlebars'), 'utf-8'));
+if (!existsSync(queryIndexScript)) {
+  await writeFile(queryIndexScript, 'export {}l');
+}
+if (!existsSync(queryDatabaseScript)) {
+  await copyFile(resolve(templateFolder, 'database.ts'), queryDatabaseScript);
+}
 
 const execCommand = async (argv:ParsedArgs, desc:string = 'nodesc') => {
   if (!argv.c && !argv.command) throw new Error('no command arg found');
@@ -32,8 +39,10 @@ const execCommand = async (argv:ParsedArgs, desc:string = 'nodesc') => {
     }));
     await writeFile(resolve(queryFolder, `${filename}.surql`), '');
     const dirContent = await readdir(queryFolder);
-    await writeFile(resolve(queryFolder, 'index.ts'), addIndexTemplate({
-      query_list: dirContent.filter(name => name.endsWith('ts') && name !== 'index.ts'),
+    await writeFile(queryIndexScript, queryIndexTemplate({
+      query_list: dirContent.filter(name => name.endsWith('ts') && ![
+        'index.ts', 'database.ts',
+      ].includes(name)),
     }));
     break;
   }
