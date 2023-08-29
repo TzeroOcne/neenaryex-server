@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "node --loader ts-node/esm src/index.ts"
+    "dev": "vite",
+    "migration:add": "node --loader ts-node/esm migration/scripts/index.ts -c add"
   },
   "keywords": [],
   "author": "",
@@ -19,7 +20,14 @@
   },
   "devDependencies": {
     "@types/node": "^20.5.7",
+    "@typescript-eslint/eslint-plugin": "^6.5.0",
+    "@typescript-eslint/parser": "^6.5.0",
+    "eslint": "^8.48.0",
+    "handlebars": "^4.7.8",
+    "minimist-lite": "^2.2.1",
     "surrealdb.js": "^0.8.4",
-    "typescript": "^5.2.2"
+    "typescript": "^5.2.2",
+    "vite": "^4.4.9",
+    "vite-plugin-node": "^3.0.2"
   }
 }

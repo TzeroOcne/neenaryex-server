@@ -16,7 +16,7 @@ components:
         password:
           type: string
 paths:
-  /ping:
+  /auth:
     post:
       tags:
         - Auth
@@ -27,11 +27,11 @@ paths:
               $ref: "#/components/schemas/AuthRequest"
       responses:
         "201":
-          description: Sucess
+          description: Success
           content:
             application/json:
               schema:
-                description: Sucess
+                description: Success
                 type: object
 tags:
   - name: Auth
