@@ -1,7 +1,7 @@
 import { defaultPort } from '@consts/config';
 import cookie from '@fastify/cookie';
 import swagger from '@fastify/swagger';
-import { AuthRequest, MDAuthResponse, Response } from '@types';
+import { AuthRequest, CollectionName, CollectionType, MDAuthResponse, QueryType, Response } from '@types';
 import fastify from 'fastify';
 import { writeFile } from 'fs/promises';
 import Surreal from 'surrealdb.js';
@@ -15,8 +15,13 @@ const db = new Surreal(import.meta.env.VITE_DB_URL, {
   db: 'nnry',
 });
 
-const createRecord = async (collection:string, record:Record<string,unknown>) => {
+const createRecord = async <T extends CollectionName>(collection:T, record:Partial<Record<keyof CollectionType<T>,unknown>>) => {
   await db.create(collection, record);
+};
+
+const runQuery = async <DataType>(query:string) => {
+  type RecordType = QueryType<DataType>;
+  return await db.query<[RecordType[], RecordType[]]>(query);
 };
 
 const createApp = async () => {
@@ -87,6 +92,11 @@ const createApp = async () => {
     }
 
     const authData = await authResponse.json() as MDAuthResponse & Response;
+    await createRecord('md_user', {
+      username: request.body.username,
+      session_key: authData.token.session,
+      refresh_key: authData.token.refresh,
+    });
 
     reply.code(201);
     return {
