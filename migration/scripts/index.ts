@@ -1,5 +1,5 @@
 import { existsSync } from 'fs';
-import { mkdir, readFile, writeFile } from 'fs/promises';
+import { mkdir, readFile, readdir, writeFile } from 'fs/promises';
 import Handlebars from 'handlebars';
 import minimist, { ParsedArgs } from 'minimist-lite';
 import { dirname, resolve } from 'path';
@@ -18,6 +18,7 @@ if (!existsSync(queryFolder)) {
 }
 
 const addTemplate = Handlebars.compile(await readFile(resolve(templateFolder, 'add.handlebars'), 'utf-8'));
+const addIndexTemplate = Handlebars.compile(await readFile(resolve(templateFolder, 'add.index.handlebars'), 'utf-8'));
 
 const execCommand = async (argv:ParsedArgs, desc:string = 'nodesc') => {
   if (!argv.c && !argv.command) throw new Error('no command arg found');
@@ -29,6 +30,15 @@ const execCommand = async (argv:ParsedArgs, desc:string = 'nodesc') => {
     await writeFile(resolve(queryFolder, `${filename}.ts`), addTemplate({
       filename,
     }));
+    await writeFile(resolve(queryFolder, `${filename}.surql`), '');
+    const dirContent = await readdir(queryFolder);
+    await writeFile(resolve(queryFolder, 'index.ts'), addIndexTemplate({
+      query_list: dirContent.filter(name => name.endsWith('ts') && name !== 'index.ts'),
+    }));
+    break;
+  }
+  case 'run': {
+    await import('../query/index.ts');
     break;
   }
   default:

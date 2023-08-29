@@ -1,5 +1,9 @@
 {{#each query_list}}
-import '{{this}}'
+import './{{this}}';
 {{/each}}
+
+setTimeout(() => {
+  console.log('Migration successfully executed');
+});
 
 export {};
