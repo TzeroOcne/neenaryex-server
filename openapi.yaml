@@ -1,0 +1,38 @@
+openapi: 3.0.3
+info:
+  title: Neenaryex API
+  description: Fastify API for Neenaryex
+  version: 0.1.0
+components:
+  schemas:
+    AuthRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+paths:
+  /ping:
+    post:
+      tags:
+        - Auth
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AuthRequest"
+      responses:
+        "201":
+          description: Sucess
+          content:
+            application/json:
+              schema:
+                description: Sucess
+                type: object
+tags:
+  - name: Auth
+    description: Auth related endpoint
