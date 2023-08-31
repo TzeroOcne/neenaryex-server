@@ -27,12 +27,111 @@ paths:
               $ref: "#/components/schemas/AuthRequest"
       responses:
         "201":
-          description: Success
+          description: Default Response
           content:
             application/json:
               schema:
-                description: Success
                 type: object
+                properties:
+                  result:
+                    anyOf:
+                      - type: string
+                        enum:
+                          - Ok
+                      - type: string
+                        enum:
+                          - Ko
+                  message:
+                    type: string
+                  error: {}
+                required:
+                  - result
+  /user/me:
+    get:
+      responses:
+        "200":
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                allOf:
+                  - type: object
+                    properties:
+                      result:
+                        anyOf:
+                          - type: string
+                            enum:
+                              - Ok
+                          - type: string
+                            enum:
+                              - Ko
+                      message:
+                        type: string
+                      error: {}
+                    required:
+                      - result
+                  - type: object
+                    properties:
+                      payload:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                          username:
+                            type: string
+                          timestamp:
+                            type: number
+                          ip:
+                            type: string
+                        required:
+                          - id
+                          - username
+                          - timestamp
+                          - ip
+        default:
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    anyOf:
+                      - type: string
+                        enum:
+                          - Ok
+                      - type: string
+                        enum:
+                          - Ko
+                  message:
+                    type: string
+                  error: {}
+                required:
+                  - result
+  /user/logout:
+    get:
+      responses:
+        default:
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  result:
+                    anyOf:
+                      - type: string
+                        enum:
+                          - Ok
+                      - type: string
+                        enum:
+                          - Ko
+                  message:
+                    type: string
+                  error: {}
+                required:
+                  - result
 tags:
   - name: Auth
     description: Auth related endpoint

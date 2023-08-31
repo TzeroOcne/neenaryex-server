@@ -22,6 +22,7 @@ export default ({ mode }:{ mode:string }) => {
       alias: [
         { find: '@lib', replacement: resolve(__dirname, 'src', '@lib' ) },
         { find: '@consts', replacement: resolve(__dirname, '@consts' ) },
+        { find: '@typebox', replacement: resolve(__dirname, '@typebox' ) },
       ],
     },
   });

@@ -1,9 +1,6 @@
-export type Result = 'Ok' | 'Ko';
+import { Static } from '@sinclair/typebox';
+import { ResponseSchema, ResultSchema, SessionResponseSchema } from '@typebox';
 
-export interface Response {
-  result: Result;
-}
-
-export interface Reply {
-  'xxx': Response;
-}
+export type ResultType = Static<typeof ResultSchema>;
+export type ResponseType = Static<typeof ResponseSchema>;
+export type SessionResponseType = Static<typeof SessionResponseSchema>;
