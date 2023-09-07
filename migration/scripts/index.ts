@@ -12,6 +12,7 @@ const templateFolder = resolve(__dirname, 'templates');
 const rootFolder = resolve(__dirname, '..');
 const queryFolder = resolve(rootFolder, 'query');
 const queryIndexScript = resolve(queryFolder, 'index.ts');
+const queryConstScript = resolve(queryFolder, 'const.ts');
 const queryDatabaseScript = resolve(queryFolder, 'database.ts');
 
 const addTemplate = Handlebars.compile(await readFile(resolve(templateFolder, 'add.handlebars'), 'utf-8'));
@@ -20,11 +21,14 @@ const queryIndexTemplate = Handlebars.compile(await readFile(resolve(templateFol
 if (!existsSync(queryFolder)) {
   await mkdir(queryFolder);
 }
+if (!existsSync(queryConstScript)) {
+  await copyFile(resolve(templateFolder, 'query.const.ts'), queryConstScript);
+}
 if (!existsSync(queryIndexScript)) {
   await writeFile(queryIndexScript, 'export {}l');
 }
 if (!existsSync(queryDatabaseScript)) {
-  await copyFile(resolve(templateFolder, 'database.ts'), queryDatabaseScript);
+  await copyFile(resolve(templateFolder, 'query.database.ts'), queryDatabaseScript);
 }
 
 const execCommand = async (argv:ParsedArgs, desc:string = 'nodesc') => {

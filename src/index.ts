@@ -1,13 +1,15 @@
-import { defaultPort } from '@consts/config';
+import { PORT } from '@config';
 import cookie from '@fastify/cookie';
 import swagger from '@fastify/swagger';
 import { TypeBoxTypeProvider } from '@fastify/type-provider-typebox';
-import { createRecord } from '@lib/database';
+import { createSsession } from '@lib/helper/auth/auth.func';
+import { login } from '@lib/helper/mangadex/mdauth/mdauth.func';
 import { encryptPayload } from '@lib/util';
 import { ResponseSchema } from '@typebox';
-import { AuthRequest, MDAuthResponse, ResponseType, SessionPayloadType } from '@types';
+import { AuthRequest, ResponseType } from '@types';
 import fastify from 'fastify';
 import { writeFile } from 'fs/promises';
+import { StatusCodes } from 'http-status-codes';
 import userRoute from './features/user/user.route';
 
 const createApp = async () => {
@@ -60,45 +62,32 @@ const createApp = async () => {
       },
     },
   }, async (request, reply) => {
-    const authResponse = await fetch('https://api.mangadex.org/auth/login', {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      method: 'POST',
-      body: JSON.stringify(request.body),
-    });
-    if (authResponse.status >= 400) {
-      reply.code(authResponse.status);
+    try {
+      const token = await login(request.body);
+      const sessionPayload = await createSsession({
+        username: request.body.username,
+        timestamp: Date.now(),
+        ip: request.ip,
+      }, token);
+
+      reply.cookie('session_key', encryptPayload(sessionPayload));
+      reply.code(201);
+      return {
+        result: 'Ok',
+      };
+    } catch (error) {
+      reply.code(StatusCodes.INTERNAL_SERVER_ERROR);
+      if (error instanceof Error) {
+        return {
+          result: 'Ko',
+          message: error.message,
+          error,
+        };
+      }
       return {
         result: 'Ko',
-        message: await authResponse.text(),
       };
     }
-
-    const { username } = request.body;
-
-    const authData = await authResponse.json() as MDAuthResponse & ResponseType;
-    const payloadData = {
-      username,
-      timestamp: Date.now(),
-      ip: request.ip,
-    };
-    const payload = encryptPayload(payloadData);
-    const sessionRecord = await createRecord('user_session', {
-      payload,
-      md_session_key: authData.token.session,
-      md_refresh_key: authData.token.refresh,
-    });
-    const sessionPayload:SessionPayloadType = {
-      id: sessionRecord.id,
-      ...payloadData,
-    };
-
-    reply.cookie('session_key', encryptPayload(sessionPayload));
-    reply.code(201);
-    return {
-      result: 'Ok',
-    };
   });
 
   app.register(userRoute, { prefix: '/user' });
@@ -110,10 +99,11 @@ const createApp = async () => {
 };
 
 const app = await createApp();
-const port = Number(import.meta.env.VITE_PORT ?? defaultPort);
 
 if (import.meta.env.PROD) {
-  app.listen({ port });
+  app.listen({
+    port: PORT,
+  });
 }
 
 export const viteNodeApp = app;

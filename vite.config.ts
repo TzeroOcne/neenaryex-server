@@ -1,16 +1,16 @@
 import { resolve } from 'path';
 import { defineConfig, loadEnv } from 'vite';
 import { VitePluginNode } from 'vite-plugin-node';
-import { defaultPort } from './@consts/config';
+import { PORT } from './neenaryex.config';
 
 export default ({ mode }:{ mode:string }) => {
   process.env = { ...process.env, ...(loadEnv(mode, process.cwd())) };
 
-  const port = Number(process.env.VITE_PORT ?? defaultPort);
+  const srcDir = resolve(__dirname, 'src');
 
   return defineConfig({
     server: {
-      port,
+      port: PORT,
     },
     plugins: [
       ...VitePluginNode({
@@ -20,9 +20,10 @@ export default ({ mode }:{ mode:string }) => {
     ],
     resolve: {
       alias: [
-        { find: '@lib', replacement: resolve(__dirname, 'src', '@lib' ) },
+        { find: '@lib', replacement: resolve(srcDir, '@lib' ) },
         { find: '@consts', replacement: resolve(__dirname, '@consts' ) },
         { find: '@typebox', replacement: resolve(__dirname, '@typebox' ) },
+        { find: '@config', replacement: resolve(__dirname, 'neenaryex.config.ts') },
       ],
     },
   });

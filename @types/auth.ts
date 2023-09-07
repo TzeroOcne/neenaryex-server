@@ -1,4 +1,5 @@
 import { Static } from '@sinclair/typebox';
-import { SessionPayload } from '@typebox/auth';
+import { SessionData, SessionPayload } from '@typebox/auth';
 
+export type SessionDataType = Static<typeof  SessionData>;
 export type SessionPayloadType = Static<typeof SessionPayload>

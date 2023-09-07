@@ -1,4 +1,4 @@
-import { isSessionValid } from '@lib/auth.func';
+import { isSessionValid } from '@lib/helper/auth/auth.func';
 import { decryptPayloadString } from '@lib/util';
 import { ResponseType } from '@types';
 import fp from 'fastify-plugin';

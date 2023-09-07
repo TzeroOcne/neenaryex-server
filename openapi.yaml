@@ -75,20 +75,25 @@ paths:
                     properties:
                       payload:
                         type: object
-                        properties:
-                          id:
-                            type: string
-                          username:
-                            type: string
-                          timestamp:
-                            type: number
-                          ip:
-                            type: string
-                        required:
-                          - id
-                          - username
-                          - timestamp
-                          - ip
+                        allOf:
+                          - type: object
+                            properties:
+                              id:
+                                type: string
+                            required:
+                              - id
+                          - type: object
+                            properties:
+                              username:
+                                type: string
+                              timestamp:
+                                type: number
+                              ip:
+                                type: string
+                            required:
+                              - username
+                              - timestamp
+                              - ip
         default:
           description: Default Response
           content:
@@ -132,6 +137,21 @@ paths:
                   error: {}
                 required:
                   - result
+  /user/sync/download:
+    get:
+      responses:
+        default:
+          description: Default Response
+          content:
+            application/json:
+              schema:
+                anyOf:
+                  - type: string
+                    enum:
+                      - Ok
+                  - type: string
+                    enum:
+                      - Ko
 tags:
   - name: Auth
     description: Auth related endpoint

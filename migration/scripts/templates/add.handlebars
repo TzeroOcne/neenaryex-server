@@ -1,7 +1,6 @@
 import { readFile } from 'fs/promises';
-import { dirname, resolve } from 'path';
-import { fileURLToPath } from 'url';
+import { resolve } from 'path';
+import { __dirname } from './const.ts';
 import { db } from './database.ts';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
 await db.query(await readFile(resolve(__dirname, '{{filename}}.surql'), 'utf-8'));

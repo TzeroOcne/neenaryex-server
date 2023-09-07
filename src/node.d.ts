@@ -5,6 +5,7 @@ interface AppEnv {
 declare global {
   interface ImportMetaEnv extends AppEnv {
     readonly VITE_DB_URL: string;
+    readonly VITE_API_URL: string;
   }
 
   namespace NodeJS {
